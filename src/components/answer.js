@@ -1,6 +1,7 @@
-import { html } from 'lit';
+import { html, css } from 'lit';
 import { PageElement } from '../helpers/page-element';
 import { LitElement } from './base';
+
 
 export class Answer extends LitElement {
   static get properties() {
@@ -10,10 +11,21 @@ export class Answer extends LitElement {
     }
   }
 
+  static get styles() {
+    return css`
+      .robot { color: blue; }
+      .notRobot { color: green }
+    `;
+  }
+
   render(){
     return html`
-      <h1 color="blue">${this.answer_user}: ${this.answer_text}</h1>`
+      <h1 class=${this.selectClass(this.isRobot)}>${this.answer_user}: ${this.answer_text}</h1>`
 
+  }
+
+  selectClass(isRobot) {
+    return (isRobot) ? 'robot' : 'notRobot';
   }
 }
 

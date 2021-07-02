@@ -3,23 +3,103 @@ const users = {};
 const elasticsearch = require('elasticsearch');
 const Client = new elasticsearch.Client({ host: 'localhost:9200' });
 
-// TODO: 1. Convert the message to question in terms of front (not ui), back and DB - DONE!
-//       2. Change the message in the UI to make it look like a question
-//       3. Add option to answer a question (add a button in the ui first) - maybe write a new tag <Q&A> </Q&A>
-//       4. Add the backend part of receiving the answer to that question
-//       5. Add the DB part of answers (add them to the table of questions)
-//       6. Change the UI to show question and answer.
-//       7. Try and Catch for DB
-//       8. Next stuff later:
-//         1) Robot that add answer if the question was asked before
-//         2) Find similar using elasticsearch
-//         3) Add a header (nice looking one)
-//         4) Add a like button and show answer by likes
-//         5) Make the robot show use results from google
-//         6) Prompt when entering the chat: The robot speaks and he says welcome or something like that
-//         7) Add some animation and other impressive UI things
-//         8) change panda array in page-chat to be an object so the search for a question will be smarter
+async function reset_database() {
+  const indexes = ["users", "questions", "answers"]
+  for (idx in indexes) {
+    let index = indexes[idx];
+    // Client.delete({
+    //   index: index,
+    // });
+    Client.deleteByQuery({
+      index: index,
+      body: {
+      query: {
+        match_all: {}
+      }
+    }
+  }, function (error, response) {
+      if (!error) {
+        // console.log(response);
+      }
+      if (error) {
+        // console.log(error);
+      }
+    });
+  }
+}
 
+async function Populate_Data() {
+  reset_database()
+
+  // Populate users
+  const users = [{ 'name': "yr" }, { 'name': "inb" }];
+  for (let idx in users) {
+    let user = users[idx];
+    await Client.index({
+        index: 'users',
+        type: "_doc",
+        body: user
+      }, function(err, resp, status) {
+        if (!err) {
+          // console.log(resp);
+        }
+        if (err) {
+          // console.log(err);
+        }
+      }
+    );
+  }
+
+
+  // Populate questions
+  const questions = [{ question: "Who", user: "yr" }, { question: "Why", user: "inb" }];
+  let questions_id = [];
+  for (let idx in questions) {
+    let question = questions[idx];
+    await Client.index({
+        index: 'questions',
+        type: "_doc",
+        body: question
+      }, function(err, resp, status) {
+        if (!err) {
+          // console.log(resp);
+          questions_id.push(resp._id);
+          // console.log(questions_id);
+        }
+        if (err) {
+          // console.log(err);
+        }
+      }
+    )
+  }
+
+  // Populate answers
+  while (questions_id.length < 2)
+  {
+    await new Promise(r => setTimeout(r, 1000));
+
+  }
+  const answers = [{question_id: questions_id[0], answer_text: "because", answer_user: "inb"},
+                    {question_id: questions_id[1], answer_text: "good", answer_user: "yr"}];
+  for (let idx in answers) {
+    let answer = answers[idx];
+    Client.index({
+        index: 'answers',
+        type: "_doc",
+        body: answer
+      }, function(err, resp, status) {
+        if (!err) {
+          // console.log(resp);
+        }
+        if (err) {
+          // console.log(err);
+        }
+      }
+    );
+  }
+}
+
+r = Populate_Data();
 
 io.on('connection', socket => {
   socket.on('new-user', name => {
@@ -33,32 +113,101 @@ io.on('connection', socket => {
     socket.broadcast.emit('user-connected', name);
   });
 
+  socket.on('search-similar-questions', query => {
+    Client.search({
+        index: "questions",
+      body: {
+        query: {
+          more_like_this: {
+            fields: ["question"],
+            like: query,
+            min_term_freq: 1,
+            min_doc_freq: 1
+          }
+        }
+      }
+    }.then(
+      console.log("jk")
+    ))
+  });
 
-  socket.on('search-similar-questions', question => {
-    "query":
-    {
-    
-    }
-
-  }
 
   socket.on('new-question', object => {
     Client.index({
       index: 'questions',
       type: "_doc",
       body: object
-    }, function (err, resp, status){
+    }, function(err, resp, status) {
       if (!err) {
         object.question_id = resp._id;
-        socket.broadcast.emit('new_question-posted', object);
-        socket.emit('new_question-posted', object);
+        Client.search({
+          index: "questions",
+          type: "_doc",
+          body: {
+            query: {
+              more_like_this: {
+                fields: ["question"],
+                like: object.question,
+                min_term_freq: 1,
+                min_doc_freq: 1
+              }
+            }
+          }
+        },function (err, resp, status){
+          if (!err) {
+            if (resp.hits.hits[0]) {
+              object.similarQuestion = resp.hits.hits[0]._id;
+
+
+              Client.search({
+                index: 'answers',
+                body: {
+                  query: {
+                    match: {
+                      question_id: object.similarQuestion
+                    }
+                  }
+                }
+              },function (err, resp, status) {
+                if (!err) {
+                  // console.log(resp);
+
+                  if (resp.hits.hits.length > 0)
+                  {
+                    let hit = resp.hits.hits
+                    object.answers = [hit[0]._source]
+                    object.answers[0].isRobot = true
+                  }
+                  else {
+                    object.answers = []
+                  }
+                  socket.broadcast.emit('new_question-posted', object);
+                  socket.emit('new_question-posted', object);
+                }
+                if(err){
+                  { console.log(err);}
+                }
+                });
+
+              // socket.broadcast.emit('new_question-posted', object);
+              // socket.emit('new_question-posted', object);
+            }
+            else{
+              // socket.broadcast.emit('new_question-posted', object);
+              // socket.emit('new_question-posted', object);
+            }
+
+
+
+          }
+          if (err)
+          { console.log(err);}
+        })
       }
-      if (err)
-      {
+      if (err) {
         console.log(err);
-      }
-    });
-  });
+      }})});
+
 
   socket.on('new-answer', answer => {
     Client.index({
@@ -68,6 +217,7 @@ io.on('connection', socket => {
     }, function (err, resp, status) {
         if (!err) {
           answer.id = resp._id;
+          answer.isRobot = false;
           socket.broadcast.emit('new_answer-posted', answer);
           socket.emit('new_answer-posted', answer);
         }

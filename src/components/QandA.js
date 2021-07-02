@@ -41,15 +41,11 @@ export class QandA extends PageElement {
 
   }
 
-  // askNewQuestion() {
-  //   socket.emit("new-question", {question: this.curr_question, user: this.name});
-  //   this.addQuestionToChat({question: this.curr_question, answers: [{user:'server' ,text: "server_ans"}]})
-  // }
 
   render(){
     return html `
-    <component-question .question=${this.question.question}></component-question>
-    ${this.answers.map(answer => html `<component-answer .answer_user=${answer.answer_user} .answer_text=${answer.answer_text}></component-answer>`)}
+    <component-question .user=${this.question.user} .question=${this.question.question}></component-question>
+    ${this.answers.map(answer => html `<component-answer .isRobot=${answer.isRobot} .answer_user=${answer.answer_user} .answer_text=${answer.answer_text}></component-answer>`)}
      <div class="input-layout">
       <vaadin-text-field
     placeholder="answer..."

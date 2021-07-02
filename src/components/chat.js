@@ -18,7 +18,8 @@ export class Chat extends PageElement {
       curr_question: { type: Object },
       name: {type: String},
       qands: {type: Object},
-      change_was_made: {type: Boolean}
+      change_was_made: {type: Boolean},
+      query: {type: String}
     };
   }
 
@@ -53,12 +54,21 @@ export class Chat extends PageElement {
     });
 
     socket.on('new_question-posted', object => {
-      this.addQuestionToChat({question: object, answers: []});
+
+      this.addQuestionToChat({question: object, answers: object.answers});
     });
   }
 
+
+
   askNewQuestion() {
     socket.emit("new-question", {question: this.curr_question, user: this.name});
+  }
+
+
+  findsimilar(){
+    // this.curr_question = "";
+    socket.emit("search-similar-questions", this.query);
   }
 
   shortcutListener(e) {
@@ -69,6 +79,10 @@ export class Chat extends PageElement {
 
   updateTask(e) {
     this.curr_question = e.target.value;
+  }
+
+  updateTask2(e) {
+    this.query = e.target.value;
   }
 
   addQuestionToChat(obj) {
@@ -83,7 +97,7 @@ export class Chat extends PageElement {
     {
       if (obj.question_id == this.qands[key].question.question_id)
       {
-        this.qands[key].answers = [...this.qands[key].answers,{answer_user: obj.answer_user, answer_text: obj.answer_text}];
+        this.qands[key].answers = [...this.qands[key].answers,{answer_user: obj.answer_user, answer_text: obj.answer_text, isRobot: obj.isRobot}];
         // this.qands[key].answers.push({answer_user: obj.answer_user, answer_text: obj.answer_text});
 
       }
@@ -106,6 +120,19 @@ export class Chat extends PageElement {
   @click="${this.askNewQuestion}">
       Ask question
     </vaadin-button>
+    <br>
+     <vaadin-text-field
+      @change="${this.updateTask2}"
+    placeholder="query"
+    value="${this.query}"
+   >
+   </vaadin-text-field>
+    <vaadin-button
+    theme="primary"
+  @click="${this.findsimilar}">
+      Sim
+    </vaadin-button>
+    
     </div>
 `
   }
