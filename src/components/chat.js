@@ -1,4 +1,4 @@
-import { html } from 'lit';
+import { html, css } from 'lit';
 import { PageElement } from '../helpers/page-element';
 import { LitElement } from '../components/base';
 import '@vaadin/vaadin-text-field';
@@ -105,8 +105,17 @@ export class Chat extends PageElement {
     this.change_was_made = true;
   }
 
+  static get styles() {
+    return css`
+    .qanda{
+      width: 500px;
+    }
+   
+    `}
+
   render() {
     return html`
+<div class="qanda">
   ${this.qands.map(qanda => html`<component-qanda .answer_user=${this.user} .question=${qanda.question} .answers=${qanda.answers}> </component-qanda>`)}
   <div class="input-layout">
       <vaadin-text-field
@@ -132,7 +141,7 @@ export class Chat extends PageElement {
   @click="${this.findsimilar}">
       Sim
     </vaadin-button>
-    
+    </div>
     </div>
 `
   }

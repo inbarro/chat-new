@@ -6,15 +6,9 @@ const  googleIt = require('google-it')
 
 const avatarNum = 10;
 
-async function google_it(query)
-{
-googleIt({'query': query}).then(results => {
-  const x = 1;
-  return results;
-}).catch(e => {
-  // any possible errors that might have occurred (like no Internet connection)
-})
-}
+
+
+
 
 // let res = google_it('covfefe irony')
 // const x = 1;
@@ -117,6 +111,19 @@ function getRandomInt() {
   return Math.floor(Math.random() * avatarNum);
 }
 
+function getTextFromGoogle(results) {
+  let x =1;
+  for (let idx in results)
+  {
+    let current_obj = results[idx]
+    if (current_obj.link.includes("youtube"))
+    {
+      continue;
+    }
+    return current_obj.snippet;
+  }
+}
+
 io.on('connection', socket => {
   socket.on('new-user', name => {
     // users[socket.id] = name;
@@ -199,8 +206,15 @@ io.on('connection', socket => {
                   else {
                     object.answers = []
                   }
-                  socket.broadcast.emit('new_question-posted', object);
-                  socket.emit('new_question-posted', object);
+                  googleIt({'query': object.question}).then(results => {
+                    let answer_text = getTextFromGoogle(results);
+                    object.answers.unshift({answer_user: "google's best answer", answer_text: answer_text, isRobot: true})
+                    socket.broadcast.emit('new_question-posted', object);
+                    socket.emit('new_question-posted', object)
+                  }).catch(e => {
+                    // any possible errors that might have occurred (like no Internet connection)
+                  })
+                  ;
                 }
                 if(err){
                   { console.log(err);}

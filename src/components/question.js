@@ -31,10 +31,13 @@ export class Question extends LitElement {
        font-size: 14px;
        color: #878787;
        }
-      .avatar {
+      .left {
         width: 5%;
         height: 50px;
 
+      }
+      .right{
+      width: 95%;
       }
       .question-layout{
       padding-left: 35px;
@@ -46,11 +49,15 @@ export class Question extends LitElement {
   render(){
     return html`
     <vaadin-horizontal-layout class="question-layout">
-    <img class="avatar" src="../../images/avatars/${this.user.avatar}.svg" alt="no avatar">
-    <div style="width: 80%"> <h3 class="user">${this.user.name}</h3>
+    <vaadin-vertical-layout class="left">
+    <img src="../../images/avatars/${this.user.avatar}.svg" alt="no avatar">
+    </vaadin-vertical-layout>
+    <vaadin-vertical-layout class="right">
+    <div> <h3 class="user">${this.user.name}</h3>
     <h3 class="question_text"> ${this.question}</h3>
     </div>
-</vaadin-horizontal-layout>
+    </vaadin-vertical-layout>
+    </vaadin-horizontal-layout>
 `
   }
 }
