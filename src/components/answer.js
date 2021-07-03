@@ -25,6 +25,7 @@ export class Answer extends LitElement {
   }
 
   selectClass(isRobot) {
+
     return (isRobot) ? 'robot' : 'notRobot';
   }
 }

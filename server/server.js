@@ -32,10 +32,10 @@ async function reset_database() {
     }
   }, function (error, response) {
       if (!error) {
-        console.log(response);
+        // console.log(response);
       }
       if (error) {
-        console.log(error);
+        // console.log(error);
       }
     });
   }
