@@ -54,8 +54,8 @@ export class Chat extends PageElement {
     });
 
     socket.on('new_question-posted', object => {
-
       this.addQuestionToChat({question: object, answers: object.answers});
+      this.change_was_made = false;
     });
   }
 
@@ -87,12 +87,11 @@ export class Chat extends PageElement {
 
   addQuestionToChat(obj) {
     this.qands = [...this.qands, obj];
+    this.change_was_made = true;
   }
 
   addAnswerToChat(obj)
   {
-    let ob = {};
-    let ob_temp = {};
     for (let key in this.qands)
     {
       if (obj.question_id == this.qands[key].question.question_id)
@@ -107,15 +106,15 @@ export class Chat extends PageElement {
 
   static get styles() {
     return css`
-    .qanda{
-      width: 500px;
+   body .container{
+      margin-top: 150px;
     }
    
     `}
 
   render() {
     return html`
-<div class="qanda">
+<div class="container">
   ${this.qands.map(qanda => html`<component-qanda .answer_user=${this.user} .question=${qanda.question} .answers=${qanda.answers}> </component-qanda>`)}
   <div class="input-layout">
       <vaadin-text-field

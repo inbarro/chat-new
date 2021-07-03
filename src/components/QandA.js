@@ -37,8 +37,10 @@ export class QandA extends PageElement {
 
   static get styles() {
     return css`
-    .qanda{
-      width: 90% !important;
+    body{
+    .qanda{ 
+     margin-top: 100px;
+    }
     }
    
     `}

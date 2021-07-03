@@ -125,6 +125,8 @@ function getTextFromGoogle(results) {
 }
 
 io.on('connection', socket => {
+
+
   socket.on('new-user', name => {
     // users[socket.id] = name;
     let avatar= getRandomInt();
@@ -137,24 +139,6 @@ io.on('connection', socket => {
       });
     socket.broadcast.emit('user-connected', new_user);
     socket.emit('user-connected', new_user);
-  });
-
-  socket.on('search-similar-questions', query => {
-    Client.search({
-        index: "questions",
-      body: {
-        query: {
-          more_like_this: {
-            fields: ["question"],
-            like: query,
-            min_term_freq: 1,
-            min_doc_freq: 1
-          }
-        }
-      }
-    }.then(
-      console.log("jk")
-    ))
   });
 
 
@@ -221,12 +205,12 @@ io.on('connection', socket => {
                 }
                 });
 
-              // socket.broadcast.emit('new_question-posted', object);
-              // socket.emit('new_question-posted', object);
+              socket.broadcast.emit('new_question-posted', object);
+              socket.emit('new_question-posted', object);
             }
             else{
-              // socket.broadcast.emit('new_question-posted', object);
-              // socket.emit('new_question-posted', object);
+              socket.broadcast.emit('new_question-posted', object);
+              socket.emit('new_question-posted', object);
             }
 
 
