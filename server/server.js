@@ -8,7 +8,10 @@ const avatarNum = 10;
 
 
 
-
+async function wait_seconds(sec)
+{
+  await new Promise(r => setTimeout(r, sec* 1000));
+}
 
 // let res = google_it('covfefe irony')
 // const x = 1;
@@ -143,7 +146,7 @@ io.on('connection', socket => {
 
 
   socket.on('new-question', object => {
-
+    let x = 1;
     Client.index({
       index: 'questions',
       type: "_doc",
@@ -167,62 +170,100 @@ io.on('connection', socket => {
         },function (err, resp, status){
           if (!err) {
             if (resp.hits.hits[0]) {
-              object.similarQuestion = resp.hits.hits[0]._id;
-              Client.search({
-                index: 'answers',
+              let question_id_arr = []
+              for (let idx in resp.hits.hits) {
+                question_id_arr.push(resp.hits.hits[idx]._id)
+              }
+              // object.similarQuestion = resp.hits.hits[0]._id;
+              // let flag
+              let flag = false;
+              let idx = -1;
+              while (!flag && idx < question_id_arr.length - 1)
+              {
+                idx = idx + 1;
+              // Client.search(
+              //   {
+              //     index: answers,
+              //     query: {
+              //       bool: {
+              //         should: [
+              //           {
+              //             terms: {
+              //               question_id: question_id_arr
+              //             }
+              //           }]
+              //       }
+              //
+              //     }
+              //   }
+
+                Client.search({
+                  index: 'answers',
                 body: {
                   query: {
                     match: {
-                      question_id: object.similarQuestion
+                      question_id: question_id_arr[idx]
+
+                      }
                     }
                   }
                 }
-              },function (err, resp, status) {
-                if (!err) {
-                  // console.log(resp);
+                , function(err, resp, status) {
+                  if (!err) {
+                    // console.log(resp);
 
-                  if (resp.hits.hits.length > 0)
-                  {
-                    let hit = resp.hits.hits
-                    object.answers = [hit[0]._source]
-                    object.answers[0].isRobot = true
+                    if (resp.hits.hits.length > 0) {
+                      flag = true;
+                      let hit = resp.hits.hits
+                      object.answers = [hit[0]._source]
+                      object.answers[0].isRobot = true
+                    } else {
+                      object.answers = []
+                    }
+                    googleIt({ 'query': object.question }).then(results => {
+                      let answer_text = getTextFromGoogle(results);
+                      object.answers.unshift({
+                        answer_user: "google's best answer",
+                        answer_text: answer_text,
+                        isRobot: true
+                      })
+                      socket.broadcast.emit('new_question-posted', object);
+                      socket.emit('new_question-posted', object)
+                    }).catch(e => {
+                      // any possible errors that might have occurred (like no Internet connection)
+                    })
+                    ;
                   }
-                  else {
-                    object.answers = []
+                  if (err) {
+                    console.log(err);
+                    {
+                      wait_seconds(2);
+                    }
                   }
-                  googleIt({'query': object.question}).then(results => {
-                    let answer_text = getTextFromGoogle(results);
-                    object.answers.unshift({answer_user: "google's best answer", answer_text: answer_text, isRobot: true})
-                    socket.broadcast.emit('new_question-posted', object);
-                    socket.emit('new_question-posted', object)
-                  }).catch(e => {
-                    // any possible errors that might have occurred (like no Internet connection)
-                  })
-                  ;
-                }
-                if(err){
-                  { console.log(err);}
-                }
-                });
+                })
+            }
+                // End client search
 
-              socket.broadcast.emit('new_question-posted', object);
-              socket.emit('new_question-posted', object);
+              // socket.broadcast.emit('new_question-posted', object);
+              // socket.emit('new_question-posted', object);
             }
             else{
-              socket.broadcast.emit('new_question-posted', object);
-              socket.emit('new_question-posted', object);
+              // socket.broadcast.emit('new_question-posted', object);
+              // socket.emit('new_question-posted', object);
             }
 
 
 
           }
           if (err)
-          { console.log(err);}
+          { console.log(err);
+            wait_seconds(2);}
         })
       }
       if (err) {
         console.log(err);
-      }})});
+        wait_seconds(2);}
+    })});
 
 
   socket.on('new-answer', answer => {
@@ -239,7 +280,7 @@ io.on('connection', socket => {
         }
       if (err)
       {
-        console.log(err);
+        // console.log(err);
       }
       }
     );
