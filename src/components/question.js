@@ -23,7 +23,7 @@ export class Question extends LitElement {
 
   render(){
     return html`
-   <h1 color="green">${this.user}: ${this.question}</h1>`
+   <h1>${this.user.name}: ${this.question}</h1>`
   }
 }
 

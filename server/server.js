@@ -2,14 +2,27 @@ const io = require('socket.io')(3000);
 const users = {};
 const elasticsearch = require('elasticsearch');
 const Client = new elasticsearch.Client({ host: 'localhost:9200' });
+const  googleIt = require('google-it')
+
+const avatarNum = 10;
+
+async function google_it(query)
+{
+googleIt({'query': query}).then(results => {
+  const x = 1;
+  return results;
+}).catch(e => {
+  // any possible errors that might have occurred (like no Internet connection)
+})
+}
+
+// let res = google_it('covfefe irony')
+// const x = 1;
 
 async function reset_database() {
-  const indexes = ["users", "questions", "answers"]
+  const indexes = ["users", "questions", "answers"];
   for (idx in indexes) {
     let index = indexes[idx];
-    // Client.delete({
-    //   index: index,
-    // });
     Client.deleteByQuery({
       index: index,
       body: {
@@ -19,20 +32,19 @@ async function reset_database() {
     }
   }, function (error, response) {
       if (!error) {
-        // console.log(response);
+        console.log(response);
       }
       if (error) {
-        // console.log(error);
+        console.log(error);
       }
     });
   }
 }
 
 async function Populate_Data() {
-  reset_database()
-
+  reset_database();
   // Populate users
-  const users = [{ 'name': "yr" }, { 'name': "inb" }];
+  const users = [{ 'name': "yr", 'avatar': 2}, { 'name': "inb" , 'avatar': 3}];
   for (let idx in users) {
     let user = users[idx];
     await Client.index({
@@ -99,18 +111,25 @@ async function Populate_Data() {
   }
 }
 
-r = Populate_Data();
+Populate_Data();
+
+function getRandomInt() {
+  return Math.floor(Math.random() * avatarNum);
+}
 
 io.on('connection', socket => {
   socket.on('new-user', name => {
-    users[socket.id] = name;
-      Client.index({
+    // users[socket.id] = name;
+    let avatar= getRandomInt();
+    let new_user = { 'name': name, 'avatar':avatar };
+    Client.index({
         index: 'users',
         type: 'mytype',
         id: socket.id,
-        body: { 'name': name }
+        body: new_user
       });
-    socket.broadcast.emit('user-connected', name);
+    socket.broadcast.emit('user-connected', new_user);
+    socket.emit('user-connected', new_user);
   });
 
   socket.on('search-similar-questions', query => {
@@ -133,10 +152,11 @@ io.on('connection', socket => {
 
 
   socket.on('new-question', object => {
+
     Client.index({
       index: 'questions',
       type: "_doc",
-      body: object
+      body: {question: object.question, user: object.user.name }
     }, function(err, resp, status) {
       if (!err) {
         object.question_id = resp._id;
@@ -157,8 +177,6 @@ io.on('connection', socket => {
           if (!err) {
             if (resp.hits.hits[0]) {
               object.similarQuestion = resp.hits.hits[0]._id;
-
-
               Client.search({
                 index: 'answers',
                 body: {

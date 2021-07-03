@@ -12,19 +12,13 @@ export class QandA extends PageElement {
       answers: Array,
       curr_answer: String,
       socket: Object,
-      answer_user: String
+      answer_user: Object
     }
   }
 
   constructor(){
     super();
     this.curr_answer = '';
-    // this.socket = socket
-
-    // socket.on('new_answer-posted', object =>{
-    //     this.curr_answer = ' '
-    // });
-
   }
 
   shortcutListener(e) {
@@ -40,7 +34,6 @@ export class QandA extends PageElement {
     socket.emit("new-answer", {question_id: this.question.question_id, answer_text: this.curr_answer, answer_user: this.answer_user});
 
   }
-
 
   render(){
     return html `

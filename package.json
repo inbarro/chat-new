@@ -39,6 +39,7 @@
     "bower": "^1.8.12",
     "elasticsearch": "^16.7.2",
     "express": "^4.17.1",
+    "google-it": "^1.6.2",
     "http": "*",
     "lit": "^2.0.0-rc.1",
     "pwa-helper-components": "~0.2.10",

@@ -16,10 +16,10 @@ export class Chat extends PageElement {
   static get properties() {
     return {
       curr_question: { type: Object },
-      name: {type: String},
       qands: {type: Object},
       change_was_made: {type: Boolean},
-      query: {type: String}
+      query: {type: String},
+      user: {type: Object}
     };
   }
 
@@ -29,18 +29,18 @@ export class Chat extends PageElement {
 
     // Takes the names from the alert
     this.change_was_made = false;
-    this.name = prompt('What is your name?');
 
     // New user connected
     // Socket emit - send event to the other side of the socket
-    socket.emit('new-user', this.name);
+    socket.emit('new-user', prompt('What is your name?'));
 
     // What's inside the text box
     this.curr_question = '';
     // this.qands = [{question: {{id: "dsdsds", text:"ma tarotze?"}, answers: [{user:'ruti' ,text: "al titarev"},{user:'ruti2' ,text: "ahi?"}]}];
     this.qands = [];
 
-    socket.on('user-connected', name => {
+    socket.on('user-connected', user => {
+      this.user = user;
     });
 
     socket.on('user-disconnected', name => {
@@ -62,7 +62,7 @@ export class Chat extends PageElement {
 
 
   askNewQuestion() {
-    socket.emit("new-question", {question: this.curr_question, user: this.name});
+    socket.emit("new-question", {question: this.curr_question, user: this.user});
   }
 
 
@@ -107,7 +107,7 @@ export class Chat extends PageElement {
 
   render() {
     return html`
-  ${this.qands.map(qanda => html`<component-qanda .answer_user=${this.name} .question=${qanda.question} .answers=${qanda.answers}> </component-qanda>`)}
+  ${this.qands.map(qanda => html`<component-qanda .answer_user=${this.user} .question=${qanda.question} .answers=${qanda.answers}> </component-qanda>`)}
   <div class="input-layout">
       <vaadin-text-field
       @change="${this.updateTask}"
