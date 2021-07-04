@@ -6,6 +6,8 @@ import '@vaadin/vaadin-button';
 import '@vaadin/vaadin-checkbox';
 import '@vaadin/vaadin-radio-button/vaadin-radio-button';
 import '@vaadin/vaadin-radio-button/vaadin-radio-group';
+import '@vaadin/vaadin-icons/vaadin-icons.js';
+
 import { QandA } from '../components/QandA'
 
 const socket = io('http://localhost:3000', { transports: ['websocket', 'polling', 'flashsocket'] });
@@ -124,11 +126,11 @@ export class Chat extends PageElement {
   <div class="input-layout">
       <vaadin-text-field class="newQuestionButton"
       @change="${this.updateTask}"
-    placeholder="Question"
+    placeholder="Ask a question..."
     value="${this.curr_question}"
    >
       </vaadin-text-field>
-      <vaadin-button class="newQuestionButton"
+      <iron-icon icon="vaadin:question-circle" style="color: #0e0f2a; margin: 7px;" class="newQuestionButton"
     theme="primary"
   @click="${this.askNewQuestion}">
       Ask question

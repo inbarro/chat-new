@@ -3,6 +3,8 @@ import { css } from 'lit-element'
 
 import { PageElement } from '../helpers/page-element';
 const socket = io('http://localhost:3000', { transports: ['websocket', 'polling', 'flashsocket'] });
+import '@polymer/iron-icon/iron-icon.js';
+import '@vaadin/vaadin-icons/vaadin-icons.js';
 import { Answer} from '../components/answer';
 
 
@@ -40,8 +42,7 @@ export class QandA extends PageElement {
   static get styles() {
     return css`
     .input-layout{ 
-     margin-top: 100px;
-   
+     margin-left: 100px;
     }
    
     `}
@@ -51,19 +52,17 @@ export class QandA extends PageElement {
     <div class="q&a">
       <component-question class="question" .user=${this.question.user} .question=${this.question.question}></component-question>
       <div class="answers">
-      ${this.answers.map(answer => html `<component-answer .isRobot=${answer.isRobot} .answer_user=${answer.answer_user} .answer_text=${answer.answer_text}></component-answer>`)}
+      ${this.answers.map(answer => html`<component-answer .isRobot=${answer.isRobot} .answer_user=${answer.answer_user} .answer_text=${answer.answer_text}></component-answer>`)}
       </div>
-       <div class="input-layout">
-        <vaadin-text-field
+       <div style= "margin: 20px 20px 20px 110px; border-radius: 50px;" class="input-layout">
+        <vaadin-text-field style="width: 40%;
+        height: 100px;"
       placeholder="answer..."
       @change = "${this.updateCurrAnswer}"
       value="${this.curr_answer}">
         </vaadin-text-field>
-        <vaadin-button
-      theme="secondary"
-    @click="${this.addNewAnswer}">
-          add answer
-      </vaadin-button>
+        <iron-icon icon="vaadin:chevron-circle-right" style="color: #0e0f2a; margin: 7px" @click="${this.addNewAnswer}">
+      </iron-icon>
       </div>
      </div>
 `}

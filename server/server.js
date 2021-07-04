@@ -159,8 +159,14 @@ io.on('connection', socket => {
         }, function(err, resp, status) {
           if (!err)
           {
-            let hit = resp.hits.hits[0];
-            res.answers = [{answer_text: hit._source.answer_text, answer_user: hit._source.answer_user}]
+            if (resp.hits.hits[0]) {
+              let hit = resp.hits.hits[0];
+              res.answers = [{ answer_text: hit._source.answer_text, answer_user: hit._source.answer_user }]
+            }
+            else
+            {
+              res.answers = [];
+            }
             socket.emit('initialize-data', res)
           }
         })

@@ -34,6 +34,7 @@
     "@vaadin/router": "^1.7.4",
     "@vaadin/vaadin-button": "^20.0.0",
     "@vaadin/vaadin-checkbox": "^20.0.0",
+    "@vaadin/vaadin-icons": "^20.0.0",
     "@vaadin/vaadin-ordered-layout": "^20.0.0",
     "@vaadin/vaadin-radio-button": "^20.0.0",
     "@vaadin/vaadin-split-layout": "^20.0.0",
