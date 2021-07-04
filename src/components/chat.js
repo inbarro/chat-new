@@ -50,7 +50,6 @@ export class Chat extends PageElement {
     socket.on('new_answer-posted', object =>{
       this.addAnswerToChat(object);
       this.change_was_made = false;
-      // this.req();
     });
 
     socket.on('new_question-posted', object => {
@@ -106,7 +105,7 @@ export class Chat extends PageElement {
 
   static get styles() {
     return css`
-   body .container{
+    .container{
       margin-top: 150px;
     }
    
@@ -133,13 +132,7 @@ export class Chat extends PageElement {
       @change="${this.updateTask2}"
     placeholder="query"
     value="${this.query}"
-   >
    </vaadin-text-field>
-    <vaadin-button
-    theme="primary"
-  @click="${this.findsimilar}">
-      Sim
-    </vaadin-button>
     </div>
     </div>
 `

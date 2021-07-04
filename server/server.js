@@ -127,6 +127,23 @@ function getTextFromGoogle(results) {
   }
 }
 
+function create_query(question_id_arr) {
+  let obj = {
+    index: "answers",
+    body: {
+      query: {
+        bool: {
+          "should": []
+        }
+      }
+    }
+  }
+  for (q in question_id_arr) {
+    obj.body.query.bool.should.push({ match_phrase: { question_id: question_id_arr[q] } })
+  }
+  return obj
+}
+
 io.on('connection', socket => {
 
 
@@ -174,46 +191,10 @@ io.on('connection', socket => {
               for (let idx in resp.hits.hits) {
                 question_id_arr.push(resp.hits.hits[idx]._id)
               }
-              // object.similarQuestion = resp.hits.hits[0]._id;
-              // let flag
-              let flag = false;
-              let idx = -1;
-              while (!flag && idx < question_id_arr.length - 1)
-              {
-                idx = idx + 1;
-              // Client.search(
-              //   {
-              //     index: answers,
-              //     query: {
-              //       bool: {
-              //         should: [
-              //           {
-              //             terms: {
-              //               question_id: question_id_arr
-              //             }
-              //           }]
-              //       }
-              //
-              //     }
-              //   }
-
-                Client.search({
-                  index: 'answers',
-                body: {
-                  query: {
-                    match: {
-                      question_id: question_id_arr[idx]
-
-                      }
-                    }
-                  }
-                }
-                , function(err, resp, status) {
+                Client.search(create_query(question_id_arr)
+                ,function(err, resp, status) {
                   if (!err) {
-                    // console.log(resp);
-
                     if (resp.hits.hits.length > 0) {
-                      flag = true;
                       let hit = resp.hits.hits
                       object.answers = [hit[0]._source]
                       object.answers[0].isRobot = true
@@ -227,6 +208,7 @@ io.on('connection', socket => {
                         answer_text: answer_text,
                         isRobot: true
                       })
+
                       socket.broadcast.emit('new_question-posted', object);
                       socket.emit('new_question-posted', object)
                     }).catch(e => {
@@ -241,7 +223,7 @@ io.on('connection', socket => {
                     }
                   }
                 })
-            }
+
                 // End client search
 
               // socket.broadcast.emit('new_question-posted', object);
