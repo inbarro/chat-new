@@ -41,27 +41,19 @@ async function reset_database() {
 async function Populate_Data() {
   reset_database();
   // Populate users
-  const users = [{ 'name': "yr", 'avatar': 2}, { 'name': "inb" , 'avatar': 3}];
+  const users = [{ 'name': "Inbar Rosenblum", 'avatar': 3}];
   for (let idx in users) {
     let user = users[idx];
     await Client.index({
         index: 'users',
         type: "_doc",
         body: user
-      }, function(err, resp, status) {
-        if (!err) {
-          // console.log(resp);
-        }
-        if (err) {
-          // console.log(err);
-        }
-      }
-    );
+      });
   }
 
 
   // Populate questions
-  const questions = [{ question: "Who", user: "yr" }, { question: "Why", user: "inb" }];
+  const questions = [{ question: "Why you should hire me?", user: "Inbar Rosenblum" }];
   let questions_id = [];
   for (let idx in questions) {
     let question = questions[idx];
@@ -71,25 +63,19 @@ async function Populate_Data() {
         body: question
       }, function(err, resp, status) {
         if (!err) {
-          // console.log(resp);
           questions_id.push(resp._id);
-          // console.log(questions_id);
-        }
-        if (err) {
-          // console.log(err);
         }
       }
     )
   }
 
   // Populate answers
-  while (questions_id.length < 2)
+  while (questions_id.length < 1)
   {
     await new Promise(r => setTimeout(r, 1000));
 
   }
-  const answers = [{question_id: questions_id[0], answer_text: "because", answer_user: "inb"},
-                    {question_id: questions_id[1], answer_text: "good", answer_user: "yr"}];
+  const answers = [{question_id: questions_id[0], answer_text: "First of all, I'm smart and cute. I'm talented and fun to work with", answer_user: "Inbar Rosenblum"},];
   for (let idx in answers) {
     let answer = answers[idx];
     Client.index({
@@ -146,6 +132,46 @@ function create_query(question_id_arr) {
 
 io.on('connection', socket => {
 
+  socket.on('initialize-data', name  => {
+    Client.search({
+      index: "questions",
+      body: {
+        query: {
+          match_all: {}
+        }
+      }
+    }, function(err, resp, status) {
+      if (!err)
+      {
+        let res = {}
+        let hit = resp.hits.hits[0]
+        res.question_id = hit._id;
+        res.question = {question: hit._source.question, user: {name: hit._source.user, avatar: 3}};
+        Client.search({
+          index: "answers",
+          body: {
+            query: {
+              bool: {
+                "must": [{ match_phrase: {question_id: res.question_id}}]
+              }
+            }
+          }
+        }, function(err, resp, status) {
+          if (!err)
+          {
+            let hit = resp.hits.hits[0];
+            res.answers = [{answer_text: hit._source.answer_text, answer_user: hit._source.answer_user}]
+            socket.emit('initialize-data', res)
+          }
+        })
+        }
+
+
+      if (err){
+        let y = 1;
+      }
+    })
+  })
 
   socket.on('new-user', name => {
     // users[socket.id] = name;
@@ -217,9 +243,9 @@ io.on('connection', socket => {
                     ;
                   }
                   if (err) {
-                    console.log(err);
+                    // console.log(err);
                     {
-                      wait_seconds(2);
+                      // wait_seconds(2);
                     }
                   }
                 })
@@ -238,13 +264,16 @@ io.on('connection', socket => {
 
           }
           if (err)
-          { console.log(err);
-            wait_seconds(2);}
+          {
+            // console.log(err);
+            // wait_seconds(2);
+            }
         })
       }
       if (err) {
-        console.log(err);
-        wait_seconds(2);}
+        // console.log(err);
+        // wait_seconds(2);
+        }
     })});
 
 

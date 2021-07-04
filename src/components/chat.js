@@ -33,10 +33,17 @@ export class Chat extends PageElement {
     // New user connected
     // Socket emit - send event to the other side of the socket
     socket.emit('new-user', prompt('What is your name?'));
+    socket.emit('initialize-data', "");
 
     // What's inside the text box
     this.curr_question = '';
     // this.qands = [{question: {{id: "dsdsds", text:"ma tarotze?"}, answers: [{user:'ruti' ,text: "al titarev"},{user:'ruti2' ,text: "ahi?"}]}];
+    socket.on('initialize-data', res =>{
+      let x = 1;
+      this.qands = [res];
+      this.change_was_made = true;
+      this.change_was_made = false;
+    })
     this.qands = [];
 
     socket.on('user-connected', user => {
@@ -105,10 +112,9 @@ export class Chat extends PageElement {
 
   static get styles() {
     return css`
-    .container{
-      margin-top: 150px;
+    .component-qanda{
+      margin: 50px;
     }
-   
     `}
 
   render() {
@@ -116,23 +122,17 @@ export class Chat extends PageElement {
 <div class="container">
   ${this.qands.map(qanda => html`<component-qanda .answer_user=${this.user} .question=${qanda.question} .answers=${qanda.answers}> </component-qanda>`)}
   <div class="input-layout">
-      <vaadin-text-field
+      <vaadin-text-field class="newQuestionButton"
       @change="${this.updateTask}"
     placeholder="Question"
     value="${this.curr_question}"
    >
       </vaadin-text-field>
-      <vaadin-button
+      <vaadin-button class="newQuestionButton"
     theme="primary"
   @click="${this.askNewQuestion}">
       Ask question
     </vaadin-button>
-    <br>
-     <vaadin-text-field
-      @change="${this.updateTask2}"
-    placeholder="query"
-    value="${this.query}"
-   </vaadin-text-field>
     </div>
     </div>
 `

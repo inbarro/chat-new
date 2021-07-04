@@ -1,4 +1,6 @@
-import { html, css } from 'lit';
+import { html } from 'lit';
+import { css } from 'lit-element'
+
 import { PageElement } from '../helpers/page-element';
 const socket = io('http://localhost:3000', { transports: ['websocket', 'polling', 'flashsocket'] });
 import { Answer} from '../components/answer';
@@ -37,10 +39,9 @@ export class QandA extends PageElement {
 
   static get styles() {
     return css`
-    body{
-    .qanda{ 
+    .input-layout{ 
      margin-top: 100px;
-    }
+   
     }
    
     `}
