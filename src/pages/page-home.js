@@ -19,6 +19,15 @@ export class PageHome extends LitElement {
     
     `};
 
+  
+    constructor() {
+      super();
+      
+      // const socket = io('http://localhost:3000', { transports: ['websocket', 'polling', 'flashsocket'] });
+
+    }  
+
+
   render() {
     return html` 
         <component-header></component-header>

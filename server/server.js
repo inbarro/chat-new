@@ -1,7 +1,7 @@
 const io = require('socket.io')(3000);
 const users = {};
 const elasticsearch = require('elasticsearch');
-const Client = new elasticsearch.Client({ host: 'localhost:9200' });
+const Client = new elasticsearch.Client({ host: 'localhost:9200'});
 const  googleIt = require('google-it')
 
 const avatarNum = 10;
@@ -184,8 +184,8 @@ io.on('connection', socket => {
     let avatar= getRandomInt();
     let new_user = { 'name': name, 'avatar':avatar };
     Client.index({
+        type: "_doc",
         index: 'users',
-        type: 'mytype',
         id: socket.id,
         body: new_user
       });

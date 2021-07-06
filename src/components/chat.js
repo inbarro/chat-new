@@ -8,8 +8,9 @@ import '@vaadin/vaadin-radio-button/vaadin-radio-group';
 import '@vaadin/vaadin-icons/vaadin-icons.js';
 
 import { QandA } from '../components/QandA'
+import SingletonFactory from './mysocket'
 
-const socket = io('http://localhost:3000', { transports: ['websocket', 'polling', 'flashsocket'] });
+const socket = SingletonFactory.getInstance();
 
 export class Chat extends LitElement {
 

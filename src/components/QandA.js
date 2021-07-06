@@ -2,11 +2,14 @@ import { html } from 'lit';
 import { css } from 'lit-element'
 
 import { LitElement } from './base';
-const socket = io('http://localhost:3000', { transports: ['websocket', 'polling', 'flashsocket'] });
+// const socket = io('http://localhost:3000', { transports: ['websocket', 'polling', 'flashsocket'] });
 import '@polymer/iron-icon/iron-icon.js';
 import '@vaadin/vaadin-icons/vaadin-icons.js';
 import { Answer} from '../components/answer';
 
+import insatnce from './mysocket';
+// import Foo from '../components/mysocket'
+import SingletonFactory from './mysocket'
 
 export class QandA extends LitElement {
 
@@ -23,6 +26,7 @@ export class QandA extends LitElement {
   constructor(){
     super();
     this.curr_answer = '';
+    this.socket = SingletonFactory.getInstance();;
   }
 
   shortcutListener(e) {
@@ -35,7 +39,7 @@ export class QandA extends LitElement {
   }
 
   addNewAnswer(){
-    socket.emit("new-answer", {question_id: this.question.question_id, answer_text: this.curr_answer, answer_user: this.answer_user.name});
+    this.socket.emit("new-answer", {question_id: this.question.question_id, answer_text: this.curr_answer, answer_user: this.answer_user.name});
 
   }
 
