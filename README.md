@@ -11,47 +11,70 @@ my bot will find previous answer for similar question and give you the best answ
 Enjoy!
 
 
-
+   
 ### Prerequisites
 
 - [node.js](https://nodejs.org)
 
-Furthermore, this project is built on [JavaScript](https://javascript.info/) with the intention of improving the developer experience.
+    Furthermore, this project is built on [JavaScript](https://javascript.info/) with the intention of improving the developer experience.
 
-### Install the dependencies
-
-    npm install
     
-### install elasticsearch
-
- - [elasticsearch](https://www.elastic.co)
+ - [elasticsearch](https://www.elastic.co/elasticsearch/)
+ 
+    Download elasticSearch from the link above.
+    After pressing the download button, a compressed file will be download to your computer, extract it.
+    
     
     Kibana (https://www.elastic.co/kibana/) is recommended as well
     
 
 
-## Guides
+## Quick start
 
     
-### Load the DB and the Server
-##### To load Elasticsearch
-Open a new CMD Terminal
+####  load Elasticsearch
+Open a new CMD Terminal.
+At the elastic search file you downloaded, go to bin file
 ```
 cd /path/to/bin
+```
+
+then run 
+```
 elasticsearch
 ```
-##### To load the Server
-Open a new Nodejs command prompt
+
+Wait until elasticsearch finished loading
+
+![Alt text](./images/elasticsearch_loaded.png)
+
+#### Install the dependencies
+
+Open a new CMD Terminal
+
+go to the main folder of this project and run:
+
+```
+SET PATH=C:\Program Files\Nodejs;%PATH%
+
+ npm install
+
+```
+    
+####  Load the Server
+Open a new CMD Terminal
 ```
 cd /path/to/server
-nodemon server
+node server
 ```
 
-### Start the development server
+#### Start the development server
 
-This command serves the app at `http://localhost:8000`
+go back to the main folder of this project and run:
 
     npm start
+    
+
     
 ### Now Let's get started!
 Open your browser at `http://localhost:8000`
