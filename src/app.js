@@ -5,9 +5,6 @@ import config from './config';
 import './pages/page-header'
 import { attachRouter, urlForName } from './router';
 // visit https://components.forter.dev for more
-import '@forter/checkbox';
-import '@forter/button';
-import '@forter/radio';
 
 import 'pwa-helper-components/pwa-install-button.js';
 import 'pwa-helper-components/pwa-update-available.js';

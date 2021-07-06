@@ -1,6 +1,5 @@
 import { html, css } from 'lit';
-import { PageElement } from '../helpers/page-element';
-import { LitElement } from '../components/base';
+import { LitElement } from './base';
 import '@vaadin/vaadin-text-field';
 import '@vaadin/vaadin-button';
 import '@vaadin/vaadin-checkbox';
@@ -12,7 +11,7 @@ import { QandA } from '../components/QandA'
 
 const socket = io('http://localhost:3000', { transports: ['websocket', 'polling', 'flashsocket'] });
 
-export class Chat extends PageElement {
+export class Chat extends LitElement {
 
   // Dont know if needed
   static get properties() {

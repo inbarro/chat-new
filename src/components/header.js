@@ -1,9 +1,10 @@
 import { html, css } from 'lit';
 import { Logo, Feature } from '../components';
 import { urlForName } from '../router';
-import { PageElement } from '../helpers/page-element';
+// import { PageElement } from '../helpers/page-element';
+import { LitElement } from './base';
 
-export class Header extends PageElement {
+export class Header extends LitElement {
 
 
   static get styles() {

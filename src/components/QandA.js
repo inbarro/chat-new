@@ -1,14 +1,14 @@
 import { html } from 'lit';
 import { css } from 'lit-element'
 
-import { PageElement } from '../helpers/page-element';
+import { LitElement } from './base';
 const socket = io('http://localhost:3000', { transports: ['websocket', 'polling', 'flashsocket'] });
 import '@polymer/iron-icon/iron-icon.js';
 import '@vaadin/vaadin-icons/vaadin-icons.js';
 import { Answer} from '../components/answer';
 
 
-export class QandA extends PageElement {
+export class QandA extends LitElement {
 
   static get properties() {
     return {

@@ -1,5 +1,4 @@
 import { html, css } from 'lit';
-import { PageElement } from '../helpers/page-element';
 import { LitElement } from './base';
 
 
